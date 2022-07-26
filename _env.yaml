@@ -1,0 +1,3 @@
+data:
+  path: D:\Projects\hisgateway\v2\go-cli
+cmd: /opt/minifi/bin/minifi.sh

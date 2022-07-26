@@ -7,7 +7,7 @@ Core Properties:
   flow service write delay interval: 500 ms
   administrative yield duration: 30 sec
   bored yield duration: 10 millis
-  max concurrent threads: #{maxConcurrentThreads}
+  max concurrent threads: '{{.MAXCONCURRENTTHREADS}}'
   variable registry properties: ''
 FlowFile Repository:
   implementation: org.apache.nifi.controller.repository.WriteAheadFlowFileRepository
@@ -52,18 +52,7 @@ Security Properties:
     algorithm: NIFI_PBKDF2_AES_GCM_256
 Processors: []
 Controller Services:
-- id: 79adeb55-a3bf-333e-0000-000000000000
-  name: AvroReader
-  type: org.apache.nifi.avro.AvroReader
-  Properties:
-    cache-size: '1000'
-    schema-access-strategy: embedded-avro-schema
-    schema-branch:
-    schema-name: ${schema.name}
-    schema-registry:
-    schema-text: ${avro.schema}
-    schema-version:
-- id: ccd6432c-4c5f-3d53-0000-000000000000
+- id: 3f4bbd81-34d9-30b3-0000-000000000000
   name: JsonRecordSetWriter
   type: org.apache.nifi.json.JsonRecordSetWriter
   Properties:
@@ -84,8 +73,8 @@ Controller Services:
     schema-text: ${avro.schema}
     schema-version:
     suppress-nulls: never-suppress
-- id: 964cf83e-fbb0-39d8-0000-000000000000
-  name: JsonRecordSetWriterOBJECT
+- id: 7291f92e-aea3-3dfd-0000-000000000000
+  name: JsonRecordSetWriterObject
   type: org.apache.nifi.json.JsonRecordSetWriter
   Properties:
     Date Format:
@@ -105,18 +94,34 @@ Controller Services:
     schema-text: ${avro.schema}
     schema-version:
     suppress-nulls: never-suppress
-- id: 95d91ac8-e790-3306-0000-000000000000
+- id: 426b6384-5949-3fd1-0000-000000000000
+  name: JsonTreeReader
+  type: org.apache.nifi.json.JsonTreeReader
+  Properties:
+    Date Format:
+    Time Format:
+    Timestamp Format:
+    schema-access-strategy: infer-schema
+    schema-branch:
+    schema-inference-cache:
+    schema-name: ${schema.name}
+    schema-registry:
+    schema-text: ${avro.schema}
+    schema-version:
+    starting-field-name:
+    starting-field-strategy: ROOT_NODE
+- id: 36a45c79-de82-3b40-0000-000000000000
   name: StandardSSLContextService
   type: org.apache.nifi.ssl.StandardSSLContextService
   Properties:
-    Keystore Filename: /Users/tan/moph/Docker/his-gateway/cert/kafka.client.#{hospcode}.keystore.jks
-    Keystore Password:
+    Keystore Filename: '{{.KEYSTORE_PATH}}'
+    Keystore Password: '{{.KEYSTORE_PASSWORD}}'
     Keystore Type: JKS
     SSL Protocol: SSL
-    Truststore Filename: /Users/tan/moph/Docker/his-gateway/cert/kafka.client.#{hospcode}.truststore.jks
-    Truststore Password:
+    Truststore Filename: '{{.TRUSTSTORE_PATH}}'
+    Truststore Password: '{{.TRUSTSTORE_PASSWORD}}'
     Truststore Type: JKS
-    key-password:
+    key-password: '{{.KEYSTORE_PASSWORD}}'
 Process Groups: []
 Input Ports: []
 Output Ports: []
