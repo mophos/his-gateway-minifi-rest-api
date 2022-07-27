@@ -3,3 +3,4 @@ data/config/*
 data/ssl/*
 tmp/*
 env.yaml
+data/update.txt
