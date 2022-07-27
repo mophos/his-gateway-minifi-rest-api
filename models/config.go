@@ -54,6 +54,7 @@ type FlowTemplateStruct struct {
 	TOPIC            string
 	HOSPCODE         string
 	BOOTSTRAP_SERVER string
+	CRON_QUERY       string
 }
 
 type FlowMainStruct struct {

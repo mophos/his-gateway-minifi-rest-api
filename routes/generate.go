@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -81,6 +82,7 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 
 	// Get all conections
 	connections := configYaml.Connections
+
 	if len(connections) == 0 {
 		return ctx.Status(500).JSON(fiber.Map{"ok": false, "message": "ไม่พบ Connection"})
 	}
@@ -145,6 +147,12 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 			PASSWORD:        conn.Password,
 		}
 
+		cronQuery := strings.Split(conn.Cronjob.CronjobQuery.RunTime, ":")
+		queryCronTab := fmt.Sprintf("%s %s * * *", cronQuery[1], cronQuery[0])
+
+		cronAll := strings.Split(conn.Cronjob.CronjobAll.RunTime, ":")
+		allCronTab := fmt.Sprintf("%s %s * * *", cronAll[1], cronAll[0])
+
 		flowData := models.FlowTemplateStruct{
 			CONNECTION_UUID:  connectionId,
 			CONNECTION_NAME:  connectionName,
@@ -154,6 +162,8 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 			TOPIC:            conn.Broker.Topic,
 			HOSPCODE:         conn.Hospcode,
 			BOOTSTRAP_SERVER: conn.Broker.BootstrapServer,
+			CRON_QUERY:       queryCronTab,
+			CRON_ALL:         allCronTab,
 		}
 
 		// tmp connection file
