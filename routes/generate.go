@@ -20,6 +20,7 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 
 	var dataPath = viper.GetString("data.path")
 	var triggerFile = viper.GetString("data.triggerFile")
+	var connectionsPath = viper.GetString("data.connections")
 
 	var settingFilePath = filepath.Join(dataPath, "data/config", "setting.yml")
 
@@ -47,6 +48,12 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 	err := os.MkdirAll(tmpDir, os.ModePerm)
 	if err != nil {
 		log.Println("Create tmp directory: ", err.Error())
+	}
+
+	// Create tmp directory
+	errCreateConnectionDir := os.MkdirAll(connectionsPath, os.ModePerm)
+	if errCreateConnectionDir != nil {
+		log.Println("Create connection directory: ", errCreateConnectionDir.Error())
 	}
 
 	mainFlowFileData := models.MainFlowTemplateDataStruct{
@@ -164,6 +171,7 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 			BOOTSTRAP_SERVER: conn.Broker.BootstrapServer,
 			CRON_QUERY:       queryCronTab,
 			CRON_ALL:         allCronTab,
+			CONNECTION_PATH:  connectionsPath,
 		}
 
 		// tmp connection file

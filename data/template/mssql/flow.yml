@@ -101,7 +101,7 @@ Processors:
   Properties:
     Conflict Resolution Strategy: replace
     Create Missing Directories: 'true'
-    Directory: ./data/connections/{{.CONNECTION_NAME}}/tables/${table_name}
+    Directory: '{{.CONNECTION_PATH}}/{{.CONNECTION_UUID}}/tables/${table_name}'
     Group:
     Last Modified Time:
     Maximum File Count:
