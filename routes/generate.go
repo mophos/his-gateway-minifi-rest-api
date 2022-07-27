@@ -1,11 +1,13 @@
 package routes
 
 import (
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/mophos/minifi-cli-go/models"
@@ -16,6 +18,8 @@ import (
 func GenerateConfig(ctx *fiber.Ctx) error {
 
 	var dataPath = viper.GetString("data.path")
+	var triggerFile = viper.GetString("data.triggerFile")
+
 	var settingFilePath = filepath.Join(dataPath, "data/config", "setting.yml")
 
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
@@ -32,7 +36,7 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errConnYaml.Error()})
 	}
 
-	// Template generate
+	//Template generate
 	templateDir := filepath.Join(dataPath, "data/template")
 	tmpDir := filepath.Join(dataPath, "data/tmp")
 	//file main.yml
@@ -241,6 +245,26 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถลบโฟลเดอร์ tmp ได้"})
 	}
 
-	return ctx.Status(200).JSON(fiber.Map{"ok": true})
+	// trigger minifi reload configure
+
+	f, errCreateStatusFile := os.Create(triggerFile)
+
+	if errCreateStatusFile != nil {
+		log.Println(errCreateStatusFile)
+		return ctx.Status(500).JSON(fiber.Map{"ok": false, "message": "ไม่สามารถสร้างไฟล์ update.txt ได้", "error": errCreateStatusFile.Error()})
+	}
+
+	defer f.Close()
+
+	updateTime := time.Now().Unix()
+	txtMessage := fmt.Sprintf("%v\n", updateTime)
+	_, errWriteUpdate := f.WriteString(txtMessage)
+
+	if errWriteUpdate != nil {
+		log.Println(errWriteUpdate)
+		return ctx.Status(500).JSON(fiber.Map{"ok": false, "message": "ไม่สามารถเขียนไฟล์ update.txt ได้", "error": errWriteUpdate.Error()})
+	}
+
+	return ctx.Status(201).JSON(fiber.Map{"ok": true})
 
 }

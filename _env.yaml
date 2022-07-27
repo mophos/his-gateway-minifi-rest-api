@@ -1,3 +1,4 @@
 data:
   path: D:\Projects\hisgateway\v2\go-cli
+  triggerFile: D:\Projects\hisgateway\v2\go-cli\data\update.txt
 cmd: /opt/minifi/bin/minifi.sh
