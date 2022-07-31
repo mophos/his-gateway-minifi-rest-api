@@ -9,10 +9,11 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/mophos/minifi-cli-go/models"
+	"github.com/spf13/viper"
 )
 
 func GetFlowStatus(ctx *fiber.Ctx) error {
-	cmdPath := "/opt/minifi/bin/minifi.sh"
+	cmdPath := viper.GetString("cmd")
 	name := ctx.Query("name")
 	query := fmt.Sprintf("processor:%s:health,stats,bulletins", name)
 
@@ -46,7 +47,7 @@ func GetFlowStatus(ctx *fiber.Ctx) error {
 }
 
 func GetMinifiStatus(ctx *fiber.Ctx) error {
-	cmdPath := "/opt/minifi/bin/minifi.sh"
+	cmdPath := viper.GetString("cmd")
 
 	var out bytes.Buffer
 	cmd := exec.Command(cmdPath, "status")
@@ -75,7 +76,7 @@ func GetMinifiStatus(ctx *fiber.Ctx) error {
 }
 
 func StartMinifi(ctx *fiber.Ctx) error {
-	cmdPath := "/opt/minifi/bin/minifi.sh"
+	cmdPath := viper.GetString("cmd")
 
 	var out bytes.Buffer
 	cmd := exec.Command(cmdPath, "start")
@@ -104,7 +105,7 @@ func StartMinifi(ctx *fiber.Ctx) error {
 }
 
 func StopMinifi(ctx *fiber.Ctx) error {
-	cmdPath := "/opt/minifi/bin/minifi.sh"
+	cmdPath := viper.GetString("cmd")
 
 	var out bytes.Buffer
 	cmd := exec.Command(cmdPath, "stop")
@@ -133,7 +134,7 @@ func StopMinifi(ctx *fiber.Ctx) error {
 }
 
 func RestartMinifi(ctx *fiber.Ctx) error {
-	cmdPath := "/opt/minifi/bin/minifi.sh"
+	cmdPath := viper.GetString("cmd")
 
 	var out bytes.Buffer
 	cmd := exec.Command(cmdPath, "restart")
