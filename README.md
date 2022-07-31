@@ -3,14 +3,15 @@
 `env.yaml` :
 
 ```yaml
-data:
-  path: /data
-  triggerFile: /data/update.txt
-  connections: /data/connections
+dataPath: /opt/minifi/data
+settingFile: /opt/minifi/data/config/setting.yml
+templatePath: /opt/minifi/data/template
+outPath: /opt/minifi/conf
 cmd: /opt/minifi/bin/minifi.sh
 ```
 
-- `data.path` ที่เก็บไฟล์ configure ของ flow.
-- `data.triggerFile` ไฟล์ที่ใช้สำหรับ trigger ให้ minifi reload config.
-- `data.connections` โฟลเดอร์สำหรับเก็บไฟล์ tables, table_manual
+- `dataPath` ที่เก็บไฟล์ configure ของ flow.
+- `settingFile` ที่อยู่ของไฟล์ที่เก็บค่า setting.yml
+- `templatePath` โฟลเดอร์ที่เก็บไฟล์ template ของ Flow
+- `outPath` ที่อยู่ของโฟลเดอร์ที่เก็บไฟล์ config.yml
 - `cmd` สำหรับอ้างอิง path ที่เก็บไฟล์ `minifi.sh`
