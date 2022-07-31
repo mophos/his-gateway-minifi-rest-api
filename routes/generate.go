@@ -40,8 +40,8 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 	}
 
 	//Template generate
-	templateDir := filepath.Join(dataPath, "data/template")
-	tmpDir := filepath.Join(dataPath, "data/tmp")
+	templateDir := viper.GetString("templatePath")
+	tmpDir := filepath.Join(dataPath, "tmp")
 	//file main.yml
 	mainFlowFile := filepath.Join(templateDir, "main.yml")
 
