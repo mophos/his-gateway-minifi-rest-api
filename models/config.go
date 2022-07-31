@@ -204,3 +204,11 @@ type CronjobAll struct {
 	RunEvery int    `yaml:"run_every" json:"run_every"`
 	RunTime  string `yaml:"run_time" json:"run_time"`
 }
+
+type StatusFileJsonStruct struct {
+	Table       string `json:"table"`
+	Status      string `json:"status" yaml:"status"`
+	Percent     int    `json:"percent" yaml:"percent"`
+	LastCreated string `json:"last_created" yaml:"last_created"`
+	SendSuccess string `json:"send_success" yaml:"send_success"`
+}

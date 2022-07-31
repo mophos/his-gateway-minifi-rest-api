@@ -160,10 +160,12 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 		cronAll := strings.Split(conn.Cronjob.CronjobAll.RunTime, ":")
 		allCronTab := fmt.Sprintf("%s %s * * *", cronAll[1], cronAll[0])
 
+		manualPath := filepath.Join(dataPath, "data/connections", connectionId, "table_manual")
+
 		flowData := models.FlowTemplateStruct{
 			CONNECTION_UUID:  connectionId,
 			CONNECTION_NAME:  connectionName,
-			MANUAL_PATH:      "/opt/minifi/table_manual",
+			MANUAL_PATH:      manualPath,
 			HIS_NAME:         conn.HisName,
 			DAYAGO:           conn.Cronjob.Dayago,
 			TOPIC:            conn.Broker.Topic,

@@ -43,6 +43,30 @@ type CreateConnectionValidateStruct struct {
 	} `json:"broker"`
 }
 
+type CreateTableQueryStruct struct {
+	Tables []struct {
+		Name      string `json:"name" validate:"required"`
+		StartDate string `json:"start_date" validate:"required"`
+		EndDate   string `json:"end_date" validate:"required"`
+	} `json:"tables"`
+}
+
+func ValidateCreateTableQueryStruct(data CreateTableQueryStruct) []*ErrorResponse {
+	var errors []*ErrorResponse
+	validate := validator.New()
+	err := validate.Struct(data)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			var element ErrorResponse
+			element.FailedField = err.StructNamespace()
+			element.Tag = err.Tag()
+			element.Value = err.Param()
+			errors = append(errors, &element)
+		}
+	}
+	return errors
+}
+
 func ValidateCreateConnectionStruct(data CreateConnectionValidateStruct) []*ErrorResponse {
 	var errors []*ErrorResponse
 	validate := validator.New()

@@ -27,11 +27,16 @@ func main() {
 
 	configRoute := app.Group("configs")
 	connectionRoute := app.Group("connections")
+	tableRoute := app.Group("tables")
 	minifiRoute := app.Group("minifi")
 
 	app.Get("/", func(ctx *fiber.Ctx) error {
 		return ctx.SendString("MINIFI API service (version 1.0)")
 	})
+
+	tableRoute.Get("/query-status/:id", routes.GetTableQueryStatus)
+	tableRoute.Post("/manual/create/:id", routes.CreateQueryTable)
+	tableRoute.Get("/info/:id/:table", routes.GetTableQueryStatusInfo)
 
 	configRoute.Put("/", routes.UpdateConfig)
 	configRoute.Get("/", routes.GetConfig)

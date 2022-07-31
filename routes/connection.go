@@ -71,7 +71,11 @@ func GetConnectionInfo(ctx *fiber.Ctx) error {
 		}
 	}
 
-	return ctx.JSON(info)
+	if len(info.ID) > 0 {
+		return ctx.JSON(info)
+	}
+
+	return ctx.JSON(fiber.Map{"ok": false, "message": "ไม่พบข้อมูลการเชื่อมต่อ"})
 }
 
 func CreateConnection(ctx *fiber.Ctx) error {
