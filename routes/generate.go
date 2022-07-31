@@ -19,7 +19,6 @@ import (
 func GenerateConfig(ctx *fiber.Ctx) error {
 
 	var dataPath = viper.GetString("dataPath")
-	var templatePath = viper.GetString("templatePath")
 	var outPath = viper.GetString("outPath")
 	var triggerFile = "/opt/minifi/data/update.txt"
 	var connectionsPath = filepath.Join(dataPath, "connections")
@@ -41,7 +40,7 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 	}
 
 	//Template generate
-	templateDir := filepath.Join(templatePath)
+	templateDir := viper.GetString("templatePath")
 	tmpDir := filepath.Join(dataPath, "tmp")
 	//file main.yml
 	mainFlowFile := filepath.Join(templateDir, "main.yml")
