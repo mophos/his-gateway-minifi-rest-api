@@ -54,6 +54,9 @@ func main() {
 	connectionRoute.Delete("/:id", routes.RemoveConnection)
 	connectionRoute.Get("/:id", routes.GetConnectionInfo)
 
+	app.Get("/version", func(ctx *fiber.Ctx) error {
+		return ctx.JSON(fiber.Map{"version": "1.0.0"})
+	})
 	log.Fatal(app.Listen(":3000"))
 
 }
