@@ -84,9 +84,10 @@ func GetTableQueryStatus(ctx *fiber.Ctx) error {
 
 	connectionId := ctx.Params("id")
 
-	var connectionPath = viper.GetString("data.connections")
+	var dataPath = viper.GetString("dataPath")
+	var connectionsPath = filepath.Join(dataPath, "connections")
 
-	tableStatusPath := filepath.Join(connectionPath, connectionId, "tables")
+	tableStatusPath := filepath.Join(connectionsPath, connectionId, "tables")
 	// Read directory
 	files, err := ioutil.ReadDir(tableStatusPath)
 	if err != nil {
@@ -138,9 +139,10 @@ func GetTableQueryStatusInfo(ctx *fiber.Ctx) error {
 	connectionId := ctx.Params("id")
 	tableName := ctx.Params("table")
 
-	var connectionPath = viper.GetString("data.connections")
+	var dataPath = viper.GetString("dataPath")
+	var connectionsPath = filepath.Join(dataPath, "connections")
 
-	tableStatusPath := filepath.Join(connectionPath, connectionId, "tables", tableName)
+	tableStatusPath := filepath.Join(connectionsPath, connectionId, "tables", tableName)
 	var jsonTables []models.StatusFileJsonStruct
 
 	statusFiles, errReadDir := ioutil.ReadDir(tableStatusPath)

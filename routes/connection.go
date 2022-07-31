@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -15,8 +14,7 @@ import (
 
 func GetConnections(ctx *fiber.Ctx) error {
 
-	var dataPath = viper.GetString("data.path")
-	var settingFilePath = filepath.Join(dataPath, "data/config", "setting.yml")
+	var settingFilePath = viper.GetString("settingFile")
 
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
 
@@ -44,8 +42,7 @@ func GetConnectionInfo(ctx *fiber.Ctx) error {
 		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "Connection ID not found."})
 	}
 
-	var dataPath = viper.GetString("data.path")
-	var settingFilePath = filepath.Join(dataPath, "data/config", "setting.yml")
+	var settingFilePath = viper.GetString("settingFile")
 
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
 
@@ -98,11 +95,9 @@ func CreateConnection(ctx *fiber.Ctx) error {
 		})
 	}
 
-	var dataPath = viper.GetString("data.path")
-
 	connectionName := data.ConnectionName
 
-	var settingFilePath = filepath.Join(dataPath, "data/config", "setting.yml")
+	var settingFilePath = viper.GetString("settingFile")
 
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
 
@@ -209,11 +204,9 @@ func EditConnection(ctx *fiber.Ctx) error {
 		})
 	}
 
-	var dataPath = viper.GetString("data.path")
-
 	connectionName := data.ConnectionName
 
-	var settingFilePath = filepath.Join(dataPath, "data/config", "setting.yml")
+	var settingFilePath = viper.GetString("settingFile")
 
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
 
@@ -310,9 +303,7 @@ func RemoveConnection(ctx *fiber.Ctx) error {
 
 	id := ctx.Params("id")
 
-	var dataPath = viper.GetString("data.path")
-
-	var settingFilePath = filepath.Join(dataPath, "data/config", "setting.yml")
+	var settingFilePath = viper.GetString("settingFile")
 
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
 

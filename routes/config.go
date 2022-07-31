@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/mophos/minifi-cli-go/models"
@@ -32,8 +31,7 @@ func UpdateConfig(ctx *fiber.Ctx) error {
 		})
 	}
 
-	var dataPath = viper.GetString("data.path")
-	var settingFilePath = filepath.Join(dataPath, "data/config", "setting.yml")
+	var settingFilePath = viper.GetString("settingFile")
 
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
 
@@ -73,10 +71,9 @@ func UpdateConfig(ctx *fiber.Ctx) error {
 }
 
 func GetConfig(ctx *fiber.Ctx) error {
-	var dataPath = viper.GetString("data.path")
-	var settingPath = filepath.Join(dataPath, "data/config", "setting.yml")
+	var settingFile = viper.GetString("settingFile")
 
-	confData, errReadYaml := ioutil.ReadFile(settingPath)
+	confData, errReadYaml := ioutil.ReadFile(settingFile)
 
 	if errReadYaml != nil {
 		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "Configure file not found."})
