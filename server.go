@@ -1,15 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"log"
-	"os/exec"
-	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/mophos/minifi-cli-go/routes"
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -18,129 +15,48 @@ func main() {
 
 	app.Use(recover.New())
 
-	cmdPath := "/opt/minifi/bin/minifi.sh"
+	// read configure file
+	viper.SetConfigName("env")
+	viper.AddConfigPath(".")
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("MINIFI API service (version 1.0)")
+	confErr := viper.ReadInConfig()
+
+	if confErr != nil {
+		panic(confErr.Error())
+	}
+
+	configRoute := app.Group("configs")
+	connectionRoute := app.Group("connections")
+	tableRoute := app.Group("tables")
+	minifiRoute := app.Group("minifi")
+
+	app.Get("/", func(ctx *fiber.Ctx) error {
+		return ctx.SendString("MINIFI API service (version 1.0)")
 	})
 
-	app.Get("/flow-status", func(c *fiber.Ctx) error {
-		name := c.Query("name")
-		query := fmt.Sprintf("processor:%s:health,stats,bulletins", name)
+	tableRoute.Get("/query-status/:id", routes.GetTableQueryStatus)
+	tableRoute.Post("/manual/create/:id", routes.CreateQueryTable)
+	tableRoute.Get("/info/:id/:table", routes.GetTableQueryStatusInfo)
 
-		cmd := exec.Command(cmdPath, "flowStatus", query)
+	configRoute.Put("/", routes.UpdateConfig)
+	configRoute.Get("/", routes.GetConfig)
+	configRoute.Post("/generate", routes.GenerateConfig)
 
-		var out bytes.Buffer
-		cmd.Stdout = &out
+	minifiRoute.Get("/flow-status", routes.GetFlowStatus)
+	minifiRoute.Get("/status", routes.GetMinifiStatus)
+	minifiRoute.Post("/start", routes.StartMinifi)
+	minifiRoute.Post("/stop", routes.StopMinifi)
+	minifiRoute.Post("/restart", routes.RestartMinifi)
 
-		err := cmd.Run()
+	connectionRoute.Get("/", routes.GetConnections)
+	connectionRoute.Post("/", routes.CreateConnection)
+	connectionRoute.Put("/:id", routes.EditConnection)
+	connectionRoute.Delete("/:id", routes.RemoveConnection)
+	connectionRoute.Get("/:id", routes.GetConnectionInfo)
 
-		if err != nil {
-			return c.Status(500).JSON(err)
-		}
-
-		fmt.Printf("%q\n", out.String())
-
-		s := strings.Replace(out.String(), "\n\n", "#", -1)
-		v := strings.Split(s, "#")
-
-		msg := v[2]
-		status := FlowStatusStruct{}
-		errJson := json.Unmarshal([]byte(msg), &status)
-
-		if errJson != nil {
-			return c.Status(500).JSON(fiber.Map{
-				"status":  500,
-				"message": err.Error(),
-			})
-		}
-		return c.JSON(status)
+	app.Get("/version", func(ctx *fiber.Ctx) error {
+		return ctx.JSON(fiber.Map{"version": "1.0.0"})
 	})
-
-	app.Post("/status", func(c *fiber.Ctx) error {
-		cmd := exec.Command(cmdPath, "start")
-
-		var out bytes.Buffer
-		cmd.Stdout = &out
-
-		err := cmd.Run()
-
-		if err != nil {
-			return c.Status(500).JSON(fiber.Map{
-				"status":  500,
-				"message": err.Error(),
-			})
-		}
-
-		fmt.Printf("%q\n", out.String())
-
-		s := strings.Replace(out.String(), "\n\n", "#", -1)
-		v := strings.Split(s, "#")
-
-		msg := v[2]
-
-		return c.JSON(fiber.Map{
-			"status":  200,
-			"message": msg,
-		})
-	})
-
-	app.Post("/start", func(c *fiber.Ctx) error {
-		cmd := exec.Command(cmdPath, "start")
-
-		var out bytes.Buffer
-		cmd.Stdout = &out
-
-		err := cmd.Run()
-
-		if err != nil {
-			return c.Status(500).JSON(fiber.Map{
-				"status":  500,
-				"message": err.Error(),
-			})
-		}
-
-		fmt.Printf("%q\n", out.String())
-
-		s := strings.Replace(out.String(), "\n\n", "#", -1)
-		v := strings.Split(s, "#")
-
-		msg := v[2]
-
-		return c.JSON(fiber.Map{
-			"status":  200,
-			"message": msg,
-		})
-	})
-
-	app.Post("/stop", func(c *fiber.Ctx) error {
-		cmd := exec.Command(cmdPath, "stop")
-
-		var out bytes.Buffer
-		cmd.Stdout = &out
-
-		err := cmd.Run()
-
-		if err != nil {
-			return c.Status(500).JSON(fiber.Map{
-				"status":  500,
-				"message": err.Error(),
-			})
-		}
-
-		fmt.Printf("%q\n", out.String())
-
-		s := strings.Replace(out.String(), "\n\n", "#", -1)
-		v := strings.Split(s, "#")
-
-		msg := v[2]
-
-		return c.JSON(fiber.Map{
-			"status":  200,
-			"message": msg,
-		})
-	})
-
 	log.Fatal(app.Listen(":3000"))
 
 }

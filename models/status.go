@@ -1,4 +1,4 @@
-package main
+package models
 
 type FlowStatusStruct struct {
 	ControllerServiceStatusList interface{} `json:"controllerServiceStatusList"`

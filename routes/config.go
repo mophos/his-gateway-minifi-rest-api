@@ -1,0 +1,96 @@
+package routes
+
+import (
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/mophos/minifi-cli-go/models"
+	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
+)
+
+func UpdateConfig(ctx *fiber.Ctx) error {
+
+	data := new(models.ConfigValidateStruct)
+
+	if errParser := ctx.BodyParser(data); errParser != nil {
+		log.Println(errParser.Error())
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"code":  fiber.StatusInternalServerError,
+			"error": errParser.Error(),
+		})
+	}
+
+	errors := models.ValidateConfigStruct(*data)
+	if errors != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"code":  fiber.StatusInternalServerError,
+			"error": "ข้อมูลไม่ครบ กรุณาตรวจสอบ",
+		})
+	}
+
+	var dataPath = viper.GetString("data.path")
+	var settingFilePath = filepath.Join(dataPath, "data/config", "setting.yml")
+
+	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
+
+	if errReadYaml != nil {
+		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "Configure file not found."})
+	}
+
+	var configYaml models.SettingStruct
+
+	errConnYaml := yaml.Unmarshal([]byte(confData), &configYaml)
+	if errConnYaml != nil {
+		log.Println(errConnYaml)
+		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errConnYaml.Error()})
+	}
+
+	configYaml.Server.MaxConcurrentThreads = data.MaxConcurrentThreads
+	configYaml.Server.KeystorePath = data.KeystorePath
+	configYaml.Server.KeystorePassword = data.KeystorePassword
+	configYaml.Server.TruststorePath = data.TruststorePath
+	configYaml.Server.TruststorePassword = data.TruststorePassword
+
+	// create file
+	yamlData, errMarshal := yaml.Marshal(&configYaml)
+	if errMarshal != nil {
+		log.Println(errMarshal.Error())
+		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errMarshal.Error()})
+	}
+
+	errWriteFile := ioutil.WriteFile(settingFilePath, yamlData, os.ModePerm)
+	if errWriteFile != nil {
+		log.Println(errWriteFile.Error())
+		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errWriteFile.Error()})
+	}
+
+	return ctx.Status(200).JSON(fiber.Map{"ok": true})
+
+}
+
+func GetConfig(ctx *fiber.Ctx) error {
+	var dataPath = viper.GetString("data.path")
+	var settingPath = filepath.Join(dataPath, "data/config", "setting.yml")
+
+	confData, errReadYaml := ioutil.ReadFile(settingPath)
+
+	if errReadYaml != nil {
+		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "Configure file not found."})
+	}
+
+	var configYaml models.SettingStruct
+
+	errConnYaml := yaml.Unmarshal([]byte(confData), &configYaml)
+	if errConnYaml != nil {
+		log.Println(errConnYaml)
+		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errConnYaml.Error()})
+	}
+
+	setting := configYaml.Server
+
+	return ctx.JSON(setting)
+}
