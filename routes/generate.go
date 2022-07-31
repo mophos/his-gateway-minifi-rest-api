@@ -18,11 +18,12 @@ import (
 
 func GenerateConfig(ctx *fiber.Ctx) error {
 
-	var dataPath = viper.GetString("data.path")
-	var triggerFile = viper.GetString("data.triggerFile")
-	var connectionsPath = viper.GetString("data.connections")
+	var dataPath = viper.GetString("dataPath")
+	var outPath = viper.GetString("outPath")
+	var triggerFile = "/opt/minifi/data/update.txt"
+	var connectionsPath = filepath.Join(dataPath, "connections")
 
-	var settingFilePath = filepath.Join(dataPath, "data/config", "setting.yml")
+	var settingFilePath = viper.GetString("settingFile")
 
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
 
@@ -160,7 +161,7 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 		cronAll := strings.Split(conn.Cronjob.CronjobAll.RunTime, ":")
 		allCronTab := fmt.Sprintf("%s %s * * *", cronAll[1], cronAll[0])
 
-		manualPath := filepath.Join(dataPath, "data/connections", connectionId, "table_manual")
+		manualPath := filepath.Join(dataPath, connectionsPath, connectionId, "table_manual")
 
 		flowData := models.FlowTemplateStruct{
 			CONNECTION_UUID:  connectionId,
@@ -251,7 +252,7 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errMarshal.Error()})
 	}
 
-	configPath := filepath.Join(dataPath, "data/config", "config.yml")
+	configPath := filepath.Join(outPath, "config.yml")
 	errWriteFile := ioutil.WriteFile(configPath, yamlData, os.ModePerm)
 	if errWriteFile != nil {
 		log.Println(errWriteFile.Error())
