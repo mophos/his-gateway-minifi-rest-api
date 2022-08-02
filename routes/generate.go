@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/mophos/minifi-cli-go/models"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
@@ -163,7 +164,9 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 
 		manualPath := filepath.Join(dataPath, connectionsPath, connectionId, "table_manual")
 
+		flowID := uuid.NewString()
 		flowData := models.FlowTemplateStruct{
+			FLOW_UUID:        flowID,
 			CONNECTION_UUID:  connectionId,
 			CONNECTION_NAME:  connectionName,
 			MANUAL_PATH:      manualPath,
