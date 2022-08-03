@@ -92,9 +92,9 @@ func GetTableQueryStatus(ctx *fiber.Ctx) error {
 	files, err := ioutil.ReadDir(tableStatusPath)
 	if err != nil {
 		log.Println(err)
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"code":    fiber.StatusInternalServerError,
-			"error":   err,
+		return ctx.Status(200).JSON(fiber.Map{
+			"ok":      false,
+			"error":   err.Error(),
 			"message": "ไม่สามารถสร้าง table json ได้",
 		})
 	}
@@ -104,7 +104,6 @@ func GetTableQueryStatus(ctx *fiber.Ctx) error {
 	var jsonTables []models.StatusFileJsonStruct
 
 	for _, f := range files {
-		log.Println(f.Name())
 		if f.IsDir() {
 			tablePath := filepath.Join(tableStatusPath, f.Name())
 
@@ -124,13 +123,10 @@ func GetTableQueryStatus(ctx *fiber.Ctx) error {
 				}
 
 			}
-
-			return ctx.JSON(jsonTables)
-
 		}
 	}
 
-	return ctx.Status(200).JSON(fiber.Map{"ok": true})
+	return ctx.JSON(fiber.Map{"ok": true, "tables": jsonTables})
 
 }
 
@@ -149,8 +145,8 @@ func GetTableQueryStatusInfo(ctx *fiber.Ctx) error {
 
 	if errReadDir != nil {
 		log.Println(errReadDir)
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"code":    fiber.StatusInternalServerError,
+		return ctx.Status(200).JSON(fiber.Map{
+			"ok":      false,
 			"error":   errReadDir,
 			"message": "ไม่สามารถอ่านไฟล์ได้",
 		})
@@ -170,9 +166,9 @@ func GetTableQueryStatusInfo(ctx *fiber.Ctx) error {
 	}
 
 	if len(jsonTables) == 0 {
-		return ctx.JSON(fiber.Map{"ok": false, "message": "ไม่พบข้อมูล"})
+		return ctx.JSON(fiber.Map{"ok": false, "error": "ไม่พบข้อมูล"})
 	}
 
-	return ctx.JSON(jsonTables)
+	return ctx.JSON(fiber.Map{"ok": true, "tables": jsonTables})
 
 }
