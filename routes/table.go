@@ -38,8 +38,11 @@ func CreateQueryTable(ctx *fiber.Ctx) error {
 		})
 	}
 
-	var connectionPath = viper.GetString("data.connections")
-	var connectionPathForCreate = filepath.Join(connectionPath, connectionId, "table_manual")
+	// var connectionPath = viper.GetString("data.connections")
+	// var connectionPathForCreate = filepath.Join(connectionPath, connectionId, "table_manual")
+
+	var dataPath = viper.GetString("dataPath")
+	var connectionPathForCreate = filepath.Join(dataPath, "connections", connectionId, "table_manual")
 
 	// create connections directory
 	errCreateConnectDir := os.MkdirAll(connectionPathForCreate, os.ModePerm)
