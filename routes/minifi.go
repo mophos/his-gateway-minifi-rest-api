@@ -25,7 +25,7 @@ func GetFlowStatus(ctx *fiber.Ctx) error {
 	err := cmd.Run()
 
 	if err != nil {
-		return ctx.Status(500).JSON(err)
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": err.Error()})
 	}
 
 	fmt.Printf("%q\n", out.String())
@@ -38,12 +38,12 @@ func GetFlowStatus(ctx *fiber.Ctx) error {
 	errJson := json.Unmarshal([]byte(msg), &status)
 
 	if errJson != nil {
-		return ctx.Status(500).JSON(fiber.Map{
-			"status":  500,
-			"message": err.Error(),
+		return ctx.Status(200).JSON(fiber.Map{
+			"ok":    false,
+			"error": err.Error(),
 		})
 	}
-	return ctx.JSON(status)
+	return ctx.JSON(fiber.Map{"ok": true, "message": status})
 }
 
 func GetMinifiStatus(ctx *fiber.Ctx) error {
@@ -56,9 +56,9 @@ func GetMinifiStatus(ctx *fiber.Ctx) error {
 	err := cmd.Run()
 
 	if err != nil {
-		return ctx.Status(500).JSON(fiber.Map{
-			"status":  500,
-			"message": err.Error(),
+		return ctx.Status(200).JSON(fiber.Map{
+			"ok":    false,
+			"error": err.Error(),
 		})
 	}
 
@@ -70,7 +70,7 @@ func GetMinifiStatus(ctx *fiber.Ctx) error {
 	msg := v[2]
 
 	return ctx.JSON(fiber.Map{
-		"status":  200,
+		"ok":      true,
 		"message": msg,
 	})
 }
@@ -85,9 +85,9 @@ func StartMinifi(ctx *fiber.Ctx) error {
 	err := cmd.Run()
 
 	if err != nil {
-		return ctx.Status(500).JSON(fiber.Map{
-			"status":  500,
-			"message": err.Error(),
+		return ctx.Status(200).JSON(fiber.Map{
+			"ok":    false,
+			"error": err.Error(),
 		})
 	}
 
@@ -99,7 +99,7 @@ func StartMinifi(ctx *fiber.Ctx) error {
 	msg := v[2]
 
 	return ctx.JSON(fiber.Map{
-		"status":  200,
+		"ok":      true,
 		"message": msg,
 	})
 }
@@ -114,9 +114,9 @@ func StopMinifi(ctx *fiber.Ctx) error {
 	err := cmd.Run()
 
 	if err != nil {
-		return ctx.Status(500).JSON(fiber.Map{
-			"status":  500,
-			"message": err.Error(),
+		return ctx.Status(200).JSON(fiber.Map{
+			"ok":    false,
+			"error": err.Error(),
 		})
 	}
 
@@ -128,7 +128,7 @@ func StopMinifi(ctx *fiber.Ctx) error {
 	msg := v[2]
 
 	return ctx.JSON(fiber.Map{
-		"status":  200,
+		"ok":      true,
 		"message": msg,
 	})
 }
@@ -143,9 +143,9 @@ func RestartMinifi(ctx *fiber.Ctx) error {
 	err := cmd.Run()
 
 	if err != nil {
-		return ctx.Status(500).JSON(fiber.Map{
-			"status":  500,
-			"message": err.Error(),
+		return ctx.Status(200).JSON(fiber.Map{
+			"ok":    false,
+			"error": err.Error(),
 		})
 	}
 
@@ -157,7 +157,7 @@ func RestartMinifi(ctx *fiber.Ctx) error {
 	msg := v[2]
 
 	return ctx.JSON(fiber.Map{
-		"status":  200,
+		"ok":      true,
 		"message": msg,
 	})
 }

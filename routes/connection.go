@@ -19,7 +19,7 @@ func GetConnections(ctx *fiber.Ctx) error {
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
 
 	if errReadYaml != nil {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "Configure file not found."})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "Configure file not found."})
 	}
 
 	var configYaml models.SettingStruct
@@ -27,7 +27,7 @@ func GetConnections(ctx *fiber.Ctx) error {
 	errConnYaml := yaml.Unmarshal([]byte(confData), &configYaml)
 	if errConnYaml != nil {
 		log.Println(errConnYaml)
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errConnYaml.Error()})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": errConnYaml.Error()})
 	}
 
 	connections := configYaml.Connections
@@ -39,7 +39,7 @@ func GetConnectionInfo(ctx *fiber.Ctx) error {
 	id := ctx.Params("id", "")
 
 	if len(id) == 0 {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "Connection ID not found."})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "Connection ID not found."})
 	}
 
 	var settingFilePath = viper.GetString("settingFile")
@@ -47,7 +47,7 @@ func GetConnectionInfo(ctx *fiber.Ctx) error {
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
 
 	if errReadYaml != nil {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errReadYaml.Error()})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": errReadYaml.Error()})
 	}
 
 	var configYaml models.SettingStruct
@@ -72,7 +72,7 @@ func GetConnectionInfo(ctx *fiber.Ctx) error {
 		return ctx.JSON(info)
 	}
 
-	return ctx.JSON(fiber.Map{"ok": false, "message": "ไม่พบข้อมูลการเชื่อมต่อ"})
+	return ctx.JSON(fiber.Map{"ok": false, "error": "ไม่พบข้อมูลการเชื่อมต่อ"})
 }
 
 func CreateConnection(ctx *fiber.Ctx) error {
@@ -81,16 +81,16 @@ func CreateConnection(ctx *fiber.Ctx) error {
 
 	if errParser := ctx.BodyParser(data); errParser != nil {
 		log.Println(errParser.Error())
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"code":  fiber.StatusInternalServerError,
+		return ctx.Status(200).JSON(fiber.Map{
+			"ok":    false,
 			"error": errParser.Error(),
 		})
 	}
 
 	errors := models.ValidateCreateConnectionStruct(*data)
 	if errors != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"code":  fiber.StatusInternalServerError,
+		return ctx.Status(200).JSON(fiber.Map{
+			"ok":    false,
 			"error": errors,
 		})
 	}
@@ -102,14 +102,14 @@ func CreateConnection(ctx *fiber.Ctx) error {
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
 
 	if errReadYaml != nil {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errReadYaml.Error()})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": errReadYaml.Error()})
 	}
 
 	var configYaml models.SettingStruct
 
 	errConnYaml := yaml.Unmarshal([]byte(confData), &configYaml)
 	if errConnYaml != nil {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errConnYaml.Error()})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": errConnYaml.Error()})
 	}
 
 	connections := configYaml.Connections
@@ -124,7 +124,7 @@ func CreateConnection(ctx *fiber.Ctx) error {
 	}
 
 	if connectionExist {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "มี Connection ชื่อนี้แล้ว"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "มี Connection ชื่อนี้แล้ว"})
 	}
 
 	// update config
@@ -132,7 +132,7 @@ func CreateConnection(ctx *fiber.Ctx) error {
 	confSettingData, errReadSettingYaml := ioutil.ReadFile(settingFilePath)
 
 	if errReadSettingYaml != nil {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่พบไฟล์ setting.yml"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "ไม่พบไฟล์ setting.yml"})
 	}
 
 	var configSettingYaml models.SettingStruct
@@ -140,7 +140,7 @@ func CreateConnection(ctx *fiber.Ctx) error {
 	errConnfigYaml := yaml.Unmarshal([]byte(confSettingData), &configSettingYaml)
 	if errConnfigYaml != nil {
 		log.Println(errConnfigYaml)
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถ decode ข้อมูลสำหรับไฟล์ setting.yml ได้"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถ decode ข้อมูลสำหรับไฟล์ setting.yml ได้"})
 	}
 
 	var setting models.SettingConnectionStruct
@@ -168,17 +168,17 @@ func CreateConnection(ctx *fiber.Ctx) error {
 	yamlSetting, errSettingMarshal := yaml.Marshal(&configSettingYaml)
 	if errSettingMarshal != nil {
 		log.Println(errSettingMarshal.Error())
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถสร้างข้อมูล yaml สำหรับไฟล์  setting.yml ได้"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถสร้างข้อมูล yaml สำหรับไฟล์  setting.yml ได้"})
 	}
 
 	// create setting file
 	errWriteSettingFile := ioutil.WriteFile(settingFilePath, yamlSetting, os.ModePerm)
 	if errWriteSettingFile != nil {
 		log.Println(errWriteSettingFile.Error())
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถสร้างไฟล์ setting.yml ได้"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถสร้างไฟล์ setting.yml ได้"})
 	}
 
-	return ctx.Status(201).JSON(fiber.Map{"ok": true})
+	return ctx.Status(200).JSON(fiber.Map{"ok": true})
 
 }
 
@@ -190,16 +190,16 @@ func EditConnection(ctx *fiber.Ctx) error {
 
 	if errParser := ctx.BodyParser(data); errParser != nil {
 		log.Println(errParser.Error())
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"code":  fiber.StatusInternalServerError,
+		return ctx.Status(200).JSON(fiber.Map{
+			"ok":    false,
 			"error": errParser.Error(),
 		})
 	}
 
 	errors := models.ValidateCreateConnectionStruct(*data)
 	if errors != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"code":  fiber.StatusInternalServerError,
+		return ctx.Status(200).JSON(fiber.Map{
+			"ok":    false,
 			"error": errors,
 		})
 	}
@@ -211,14 +211,14 @@ func EditConnection(ctx *fiber.Ctx) error {
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
 
 	if errReadYaml != nil {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errReadYaml.Error()})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": errReadYaml.Error()})
 	}
 
 	var configYaml models.SettingStruct
 
 	errConnYaml := yaml.Unmarshal([]byte(confData), &configYaml)
 	if errConnYaml != nil {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errConnYaml.Error()})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": errConnYaml.Error()})
 	}
 
 	connections := configYaml.Connections
@@ -232,7 +232,7 @@ func EditConnection(ctx *fiber.Ctx) error {
 	}
 
 	if isDuplicated {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "มี Connection ชื่อนี้แล้ว"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "มี Connection ชื่อนี้แล้ว"})
 	}
 
 	// update config
@@ -240,7 +240,7 @@ func EditConnection(ctx *fiber.Ctx) error {
 	confSettingData, errReadSettingYaml := ioutil.ReadFile(settingFilePath)
 
 	if errReadSettingYaml != nil {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่พบไฟล์ setting.yml"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "ไม่พบไฟล์ setting.yml"})
 	}
 
 	var configSettingYaml models.SettingStruct
@@ -248,7 +248,7 @@ func EditConnection(ctx *fiber.Ctx) error {
 	errConnfigYaml := yaml.Unmarshal([]byte(confSettingData), &configSettingYaml)
 	if errConnfigYaml != nil {
 		log.Println(errConnfigYaml)
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถ decode ข้อมูลสำหรับไฟล์ setting.yml ได้"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถ decode ข้อมูลสำหรับไฟล์ setting.yml ได้"})
 	}
 
 	var setting models.SettingConnectionStruct
@@ -285,17 +285,17 @@ func EditConnection(ctx *fiber.Ctx) error {
 	yamlSetting, errSettingMarshal := yaml.Marshal(&configSettingYaml)
 	if errSettingMarshal != nil {
 		log.Println(errSettingMarshal.Error())
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถสร้างข้อมูล yaml สำหรับไฟล์  setting.yml ได้"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถสร้างข้อมูล yaml สำหรับไฟล์  setting.yml ได้"})
 	}
 
 	// create setting file
 	errWriteSettingFile := ioutil.WriteFile(settingFilePath, yamlSetting, os.ModePerm)
 	if errWriteSettingFile != nil {
 		log.Println(errWriteSettingFile.Error())
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถสร้างไฟล์ setting.yml ได้"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถสร้างไฟล์ setting.yml ได้"})
 	}
 
-	return ctx.Status(200).JSON(setting)
+	return ctx.Status(200).JSON(fiber.Map{"ok": true, "setting": setting})
 
 }
 
@@ -308,20 +308,20 @@ func RemoveConnection(ctx *fiber.Ctx) error {
 	confData, errReadYaml := ioutil.ReadFile(settingFilePath)
 
 	if errReadYaml != nil {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errReadYaml.Error()})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": errReadYaml.Error()})
 	}
 
 	var configYaml models.SettingStruct
 
 	errConnYaml := yaml.Unmarshal([]byte(confData), &configYaml)
 	if errConnYaml != nil {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": errConnYaml.Error()})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": errConnYaml.Error()})
 	}
 
 	confSettingData, errReadSettingYaml := ioutil.ReadFile(settingFilePath)
 
 	if errReadSettingYaml != nil {
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่พบไฟล์ setting.yml"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "ไม่พบไฟล์ setting.yml"})
 	}
 
 	var configSettingYaml models.SettingStruct
@@ -329,7 +329,7 @@ func RemoveConnection(ctx *fiber.Ctx) error {
 	errConnfigYaml := yaml.Unmarshal([]byte(confSettingData), &configSettingYaml)
 	if errConnfigYaml != nil {
 		log.Println(errConnfigYaml)
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถ decode ข้อมูลสำหรับไฟล์ setting.yml ได้"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถ decode ข้อมูลสำหรับไฟล์ setting.yml ได้"})
 	}
 
 	for idx, item := range configSettingYaml.Connections {
@@ -342,14 +342,14 @@ func RemoveConnection(ctx *fiber.Ctx) error {
 	yamlSetting, errSettingMarshal := yaml.Marshal(&configSettingYaml)
 	if errSettingMarshal != nil {
 		log.Println(errSettingMarshal.Error())
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถสร้างข้อมูล yaml สำหรับไฟล์  setting.yml ได้"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถสร้างข้อมูล yaml สำหรับไฟล์  setting.yml ได้"})
 	}
 
 	// create setting file
 	errWriteSettingFile := ioutil.WriteFile(settingFilePath, yamlSetting, os.ModePerm)
 	if errWriteSettingFile != nil {
 		log.Println(errWriteSettingFile.Error())
-		return ctx.Status(500).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถสร้างไฟล์ setting.yml ได้"})
+		return ctx.Status(200).JSON(fiber.Map{"ok": false, "error": "ไม่สามารถสร้างไฟล์ setting.yml ได้"})
 	}
 
 	return ctx.Status(200).JSON(fiber.Map{"ok": true})
