@@ -154,7 +154,7 @@ type FlowStruct struct {
 		YieldPeriod                     string        `yaml:"yield period"`
 		RunDurationNanos                int           `yaml:"run duration nanos"`
 		AutoTerminatedRelationshipsList []interface{} `yaml:"auto-terminated relationships list"`
-		Properties                      struct{}      `yaml:"Properties,omitempty"`
+		Properties                      interface{}   `yaml:"Properties,omitempty"`
 	} `yaml:"Processors"`
 	ControllerServices []struct{} `yaml:"Controller Services"`
 	ProcessGroups      []struct{} `yaml:"Process Groups"`

@@ -22,6 +22,7 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 	var dataPath = viper.GetString("dataPath")
 	var outPath = viper.GetString("outPath")
 	var triggerFile = "/opt/minifi/data/update.txt"
+	// var triggerFile = "./data/update.txt"
 	var connectionsPath = filepath.Join(dataPath, "connections")
 
 	var settingFilePath = viper.GetString("settingFile")
@@ -163,7 +164,7 @@ func GenerateConfig(ctx *fiber.Ctx) error {
 		cronAll := strings.Split(conn.Cronjob.CronjobAll.RunTime, ":")
 		allCronTab := fmt.Sprintf("%s %s * * *", cronAll[1], cronAll[0])
 
-		manualPath := filepath.Join(dataPath, connectionsPath, connectionId, "table_manual")
+		manualPath := filepath.Join(connectionsPath, connectionId, "table_manual")
 
 		flowID := uuid.NewString()
 		flowData := models.FlowTemplateStruct{

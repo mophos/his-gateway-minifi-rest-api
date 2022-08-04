@@ -5,3 +5,4 @@ tmp/*
 env.yaml
 data/update.txt
 data/connections/*
+data/conf/*
